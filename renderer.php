@@ -106,17 +106,12 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
         global $INFO;
 
         if($text) {
-            $tmpDoc = $this->doc;
-            $this->doc = "";
-
             /* There should be no class for "sectioneditX" if there is no edit perm */
             $maxLevel = $conf['maxseclevel'];
             if ( $INFO['perm'] <= AUTH_READ )
             {
                 $conf['maxseclevel'] = 0;
             }
-            parent::header($text, $level, $pos);
-            $conf['maxseclevel'] = $maxLevel;
 
             $headingNumber = '';
             $useNumbered = p_get_metadata($ID, 'usenumberedheading', true); // 2011-02-07 This should be save to use
@@ -139,9 +134,9 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
 
                 $headingNumber = preg_replace("/(\.0)+\.?$/", '', $headingNumber) . ' ';
             }
-
-//            $this->doc = $tmpDoc . preg_replace("/<\/?p>/i", '', str_replace($this->_xmlEntities($text) . "</a></h$level>".DOKU_LF, trim(preg_replace("/<\/?(p)>/is", "", p_render('xhtml', p_get_instructions(trim($headingNumber . $text)), $info)))  . "</a></h$level>".DOKU_LF, $this->doc));
-              $this->doc = $tmpDoc . preg_replace("/<h1(.*?)>/", '<h1 title="' . $this->_xmlEntities($text) . '"$1>', $this->doc);
+			
+            parent::header($headingNumber . $text, $level, $pos);
+            $conf['maxseclevel'] = $maxLevel;
 
         } else if ( $INFO['perm'] > AUTH_READ ) {
 
