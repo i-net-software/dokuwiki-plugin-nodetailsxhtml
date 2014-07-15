@@ -28,7 +28,7 @@ class action_plugin_nodetailsxhtml extends DokuWiki_Action_Plugin {
     	/**
 	* Register Plugin in DW
 	**/
-	function register(&$controller) {
+	function register(Doku_Event_Handler $controller) {
 		$controller->register_hook('TPL_TOC_RENDER', 'BEFORE', $this, 'check_toc');
 	}
 	
