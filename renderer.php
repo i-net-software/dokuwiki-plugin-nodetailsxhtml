@@ -76,20 +76,21 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
         // Prepare the TOC
         global $TOC, $ID;
         $meta = array();
+        $forceToc = $this->info['forceTOC'] || p_get_metadata($ID, 'forceTOC', false);
         
         // NOTOC, and no forceTOC
-        if ( $this->info['toc'] === false && !($this->info['forceTOC'] || $this->meta['forceTOC']) ) {
+        if ( $this->info['toc'] === false && !$forceToc ) {
             $TOC = $this->toc = array();
             $meta['internal']['toc'] = false;
             $meta['description']['tableofcontents'] = array();
             $meta['forceTOC'] = false;
             
-        } else if ( $this->info['forceTOC'] || $this->meta['forceTOC'] || (utf8_strlen(strip_tags($this->doc)) >= $this->getConf('documentlengthfortoc') && count($this->toc) > 1 ) ) {
+        } else if ( $forceToc || (utf8_strlen(strip_tags($this->doc)) >= $this->getConf('documentlengthfortoc') && count($this->toc) > 1 ) ) {
             $TOC = $this->toc;
             // This is a little bit like cheating ... but this will force the TOC into the metadata
             $meta = array();
             $meta['internal']['toc'] = true;
-            $meta['forceTOC'] = $this->info['forceTOC'] || $this->meta['forceTOC'];
+            $meta['forceTOC'] = $forceToc;
             $meta['description']['tableofcontents'] = $TOC;
         }
         
@@ -168,8 +169,8 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
         return "";
     }
 
-    function internalmedia ($src, $title=NULL, $align=NULL, $width=NULL,
-    $height=NULL, $cache=NULL, $linking=NULL) {
+    function internalmedia ($src, $title=null, $align=null, $width=null,
+                            $height=null, $cache=null, $linking=null, $return=NULL) {
         global $ID;
         list($src,$hash) = explode('#',$src,2);
         resolve_mediaid(getNS($ID),$src, $exists);
@@ -342,6 +343,7 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
 	// Returns 'normal' chars as chars and weirdos as numeric html entites.
 	function superentities( $str ){
 	    // get rid of existing entities else double-escape
+	    $str2 = '';
 	    $str = html_entity_decode(stripslashes($str),ENT_QUOTES,'UTF-8'); 
 	    $ar = preg_split('/(?<!^)(?!$)(?!\n)/u', $str );  // return array of every multi-byte character
 	    foreach ($ar as $c){
