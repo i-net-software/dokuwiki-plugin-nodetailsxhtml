@@ -99,7 +99,7 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
         p_set_metadata($ID, $meta);
 
         // make sure there are no empty blocks
-        $this->doc = preg_replace('#<div class=".*?level\d.*?">\s*</div>#','',$this->doc);
+        $this->doc = preg_replace('#<(div|section|article) class=".*?level\d.*?">\s*</(div|section|article)>#','',$this->doc);
     }
 
     function header($text, $level, $pos) {
@@ -149,7 +149,11 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
 			$this->doc = "";
             parent::header($headingNumber . $text, $level, $pos);
             
-            $this->doc = $doc . preg_replace("/(<h([1-9]))/", "<".($this->sectionLevel<1?'section':'article')." class=\"level\\2{$class}\">\\1", $this->doc);
+            if ( $this->getConf('useSectionArticle') ) {
+                $this->doc = $doc . preg_replace("/(<h([1-9]))/", "<".($this->sectionLevel<1?'section':'article')." class=\"level\\2{$class}\">\\1", $this->doc);
+            } else {
+                $this->doc = $doc . $this->doc;
+            }
 
             $conf['maxseclevel'] = $maxLevel;
 
@@ -159,7 +163,9 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
              
             // write the header
             $name = $this->startSectionEdit($pos, 'section_empty', rand() . $level);
-            $this->doc .= '<'.($this->sectionLevel<1?'section':'article').' class="'.$name.'">';
+            if ( $this->getConf('useSectionArticle') ) {
+                $this->doc .= '<'.($this->sectionLevel<1?'section':'article').' class="'.$name.'">';
+            }
 
             $this->doc .= DOKU_LF.'<a name="'. $name .'" class="' . $name . '" ></a>'.DOKU_LF;
         }
@@ -187,7 +193,10 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
 
     function section_close() {
         $this->sectionLevel--;
-        $this->doc .= DOKU_LF.'</div>'.DOKU_LF.'</'.($this->sectionLevel<1?'section':'article').'>'.DOKU_LF;
+        $this->doc .= DOKU_LF.'</div>'.DOKU_LF;
+        if ( $this->getConf('useSectionArticle') ) {
+            $this->doc .= '</'.($this->sectionLevel<1?'section':'article').'>'.DOKU_LF;
+        }
     }
     
     function section_open($level) {
