@@ -18,6 +18,7 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
     var $acronymsExchanged = null;
     var $hasSeenHeader = false;
     var $scriptmode = false;
+    var $sectionLevel = 0;
 
     var $startlevel = 0; // level to start with numbered headings (default = 2)
     var $levels = array( '======'=>1,
@@ -98,7 +99,7 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
         p_set_metadata($ID, $meta);
 
         // make sure there are no empty blocks
-        $this->doc = preg_replace('#<div class="level\d">\s*</div>#','',$this->doc);
+        $this->doc = preg_replace('#<div class=".*?level\d.*?">\s*</div>#','',$this->doc);
     }
 
     function header($text, $level, $pos) {
@@ -107,6 +108,14 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
         global $INFO;
 
         if($text) {
+	        
+	        // Check Text for hint about a CSS style class
+	        $class = "";
+	        if ( preg_match("/^class:(.*?)>(.*?)$/", $text, $matches) ) {
+		        $class = ' ' . $this->_xmlEntities($matches[1]);
+		        $text = $matches[2];
+	        }
+	        	        
             /* There should be no class for "sectioneditX" if there is no edit perm */
             $maxLevel = $conf['maxseclevel'];
             if ( $INFO['perm'] <= AUTH_READ )
@@ -136,7 +145,12 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
                 $headingNumber = preg_replace("/(\.0)+\.?$/", '', $headingNumber) . ' ';
             }
 			
+			$doc = $this->doc;
+			$this->doc = "";
             parent::header($headingNumber . $text, $level, $pos);
+            
+            $this->doc = $doc . preg_replace("/(<h([1-9]))/", "<".($this->sectionLevel<1?'section':'article')." class=\"level\\2{$class}\">\\1", $this->doc);
+
             $conf['maxseclevel'] = $maxLevel;
 
         } else if ( $INFO['perm'] > AUTH_READ ) {
@@ -144,8 +158,10 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
             if ( $hasSeenHeader ) $this->finishSectionEdit($pos);
              
             // write the header
-            $name = rand() . $level;
-            $this->doc .= DOKU_LF.'<a name="'. $this->startSectionEdit($pos, 'section_empty', $name) .'" class="' . $this->startSectionEdit($pos, 'section_empty', $name) . '" ></a>'.DOKU_LF;
+            $name = $this->startSectionEdit($pos, 'section_empty', rand() . $level);
+            $this->doc .= '<'.($this->sectionLevel<1?'section':'article').' class="'.$name.'">';
+
+            $this->doc .= DOKU_LF.'<a name="'. $name .'" class="' . $name . '" ></a>'.DOKU_LF;
         }
 
         $hasSeenHeader = true;
@@ -167,6 +183,16 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
         }
 
         return "";
+    }
+
+    function section_close() {
+        $this->sectionLevel--;
+        $this->doc .= DOKU_LF.'</div>'.DOKU_LF.'</'.($this->sectionLevel<1?'section':'article').'>'.DOKU_LF;
+    }
+    
+    function section_open($level) {
+        $this->sectionLevel++;
+        return parent::section_open($level);
     }
 
     function internalmedia ($src, $title=null, $align=null, $width=null,
@@ -326,7 +352,9 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
 
     function _xmlEntities($string) {
 
-        $string = parent::_xmlEntities($string);
+        // No double encode ...
+        $string = htmlspecialchars($string, ENT_QUOTES, 'UTF-8', false);
+        // $string = parent::_xmlEntities($string);
         $string = htmlentities($string, 8, 'UTF-8');
         $string = $this->superentities($string);
 
