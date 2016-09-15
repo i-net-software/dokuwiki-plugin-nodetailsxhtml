@@ -42,11 +42,11 @@ class syntax_plugin_nodetailsxhtml_forcetoc extends DokuWiki_Syntax_Plugin {
     }    
     
     function render($mode, &$renderer, $data) {
-        global $ID;
+        global $ID, $INFO;
         
         $renderer->info['forceTOC'] = true;
         $renderer->info['toc'] = true;
-        $renderer->meta['forceTOC'] = true;
+        $renderer->meta['internal']['forceTOC'] = true;
         return true;
     }
 }

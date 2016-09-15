@@ -58,12 +58,24 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
     }
 
     function document_start() {
-        global $TOC, $ID, $INFO;
+        global $TOC, $ID, $INFO, $conf;
         
         parent::document_start();
 
         // Cheating in again
-        $newMeta = p_get_metadata($ID, 'description tableofcontents', false); // 2010-10-23 This should be save to use
+        $meta = p_get_metadata($ID, null, false); // 2010-10-23 This should be save to use
+        
+        if (isset($meta['toc']['toptoclevel'])) {
+            $conf['toptoclevel'] = $meta['toc']['toptoclevel'];
+        }
+        if (isset($meta['toc']['maxtoclevel'])) {
+            $conf['maxtoclevel'] = $meta['toc']['maxtoclevel'];
+        }
+        if (isset($meta['toc']['toptoclevel'])||isset($INFO['meta']['toc']['maxtoclevel'])) {
+            $conf['tocminheads'] = 1;
+        }
+
+        $newMeta = $meta['description']['tableofcontents'];
         if ( !empty( $newMeta ) && count($newMeta) > 1 ) {
             // $TOC = $this->toc = $newMeta; // 2010-08-23 doubled the TOC
             $TOC = $newMeta;
@@ -77,24 +89,25 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
         // Prepare the TOC
         global $TOC, $ID;
         $meta = array();
-        $forceToc = $this->info['forceTOC'] || p_get_metadata($ID, 'forceTOC', false);
+        
+        $forceToc = $this->info['forceTOC'] || p_get_metadata($ID, 'internal forceTOC', false);
         
         // NOTOC, and no forceTOC
         if ( $this->info['toc'] === false && !$forceToc ) {
             $TOC = $this->toc = array();
             $meta['internal']['toc'] = false;
             $meta['description']['tableofcontents'] = array();
-            $meta['forceTOC'] = false;
+            $meta['internal']['forceTOC'] = false;
             
         } else if ( $forceToc || (utf8_strlen(strip_tags($this->doc)) >= $this->getConf('documentlengthfortoc') && count($this->toc) > 1 ) ) {
             $TOC = $this->toc;
             // This is a little bit like cheating ... but this will force the TOC into the metadata
             $meta = array();
             $meta['internal']['toc'] = true;
-            $meta['forceTOC'] = $forceToc;
+            $meta['internal']['forceTOC'] = $forceToc;
             $meta['description']['tableofcontents'] = $TOC;
         }
-        
+
         // allways write new metadata
         p_set_metadata($ID, $meta);
 
@@ -147,6 +160,7 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
 			
 			$doc = $this->doc;
 			$this->doc = "";
+			
             parent::header($headingNumber . $text, $level, $pos);
             
             if ( $this->getConf('useSectionArticle') ) {
