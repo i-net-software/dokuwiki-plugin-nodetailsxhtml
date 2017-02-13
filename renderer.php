@@ -450,6 +450,8 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
             
             $info = @getimagesize(mediaFN($src)); //get original size
             if($info !== false) {
+                
+                if ( !$w && !$h ) $w = $info[0];  
                 if(!$h) $h = round(($w * $info[1]) / $info[0]);
                 if(!$w) $w = round(($h * $info[0]) / $info[1]);
             }
