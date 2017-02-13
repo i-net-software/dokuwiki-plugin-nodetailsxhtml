@@ -428,6 +428,34 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
 	    }
 	    return $str2;
 	}
-}
+	
+    /**
+     * Renders internal and external media
+     *
+     * @author Andreas Gohr <andi@splitbrain.org>
+     * @param string $src       media ID
+     * @param string $title     descriptive text
+     * @param string $align     left|center|right
+     * @param int    $width     width of media in pixel
+     * @param int    $height    height of media in pixel
+     * @param string $cache     cache|recache|nocache
+     * @param bool   $render    should the media be embedded inline or just linked
+     * @return string
+     */
+    function _media($src, $title = null, $align = null, $w = null,
+                    $h = null, $cache = null, $render = true) {
 
+        list($ext, $mime) = mimetype($src);
+        if(substr($mime, 0, 5) == 'image' && !($w && $h) ) {
+            
+            $info = @getimagesize(mediaFN($src)); //get original size
+            if($info !== false) {
+                if(!$h) $h = round(($w * $info[1]) / $info[0]);
+                if(!$w) $w = round(($h * $info[0]) / $info[1]);
+            }
+        }
+        
+        return parent::_media($src, $title, $align, $w, $h, $cache, $render);
+    }
+}
 //Setup VIM: ex: et ts=4 enc=utf-8 :
