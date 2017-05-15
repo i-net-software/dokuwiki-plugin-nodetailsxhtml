@@ -15,31 +15,32 @@ require_once DOKU_INC . 'inc/parser/xhtml.php';
  */
 class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
 
-    var $acronymsExchanged = null;
-    var $hasSeenHeader = false;
-    var $scriptmode = false;
-    var $sectionLevel = 0;
+    private $acronymsExchanged = null;
+    private $hasSeenHeader = false;
+    private $scriptmode = false;
 
-    var $startlevel = 0; // level to start with numbered headings (default = 2)
-    var $levels = array( '======'=>1,
-                         '====='=>2,
-                         '===='=>3,
-                         '==='=>4,
-                         '=='=>5);
-
-    var $info = array(
-        'cache'      => true, // may the rendered result cached?
-        'toc'        => true, // render the TOC?
-        'forceTOC'   => false, // shall I force the TOC?
-        'scriptmode' => false, // In scriptmode, some tags will not be encoded => '<%', '%>'
+    private $startlevel = 0; // level to start with numbered headings (default = 2)
+    private $levels = array(        '======'=>1,
+                                    '====='=>2,
+                                    '===='=>3,
+                                    '==='=>4,
+                                    '=='=>5
     );
 
-    var $headingCount =
-    array(  1=>0,
-    2=>0,
-    3=>0,
-    4=>0,
-    5=>0);
+    public $sectionLevel = 0;
+    public $info = array(
+                                    'cache'      => true, // may the rendered result cached?
+                                    'toc'        => true, // render the TOC?
+                                    'forceTOC'   => false, // shall I force the TOC?
+                                    'scriptmode' => false, // In scriptmode, some tags will not be encoded => '<%', '%>'
+    );
+
+    public $headingCount = array(   1=>0,
+                                    2=>0,
+                                    3=>0,
+                                    4=>0,
+                                    5=>0
+    );
 
     /**
      * return some info
@@ -48,8 +49,8 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
         if ( method_exists(parent, 'getInfo')) {
             $info = parent::getInfo();
         }
-	    return array_merge(is_array($info) ? $info : confToHash(dirname(__FILE__).'/../plugin.info.txt'), array(
-        
+        return array_merge(is_array($info) ? $info : confToHash(dirname(__FILE__).'/../plugin.info.txt'), array(
+
         ));
     }
 
@@ -59,12 +60,12 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
 
     function document_start() {
         global $TOC, $ID, $INFO, $conf;
-        
+
         parent::document_start();
 
         // Cheating in again
         $meta = p_get_metadata($ID, null, false); // 2010-10-23 This should be save to use
-        
+
         if (isset($meta['toc']['toptoclevel'])) {
             $conf['toptoclevel'] = $meta['toc']['toptoclevel'];
         }
@@ -85,20 +86,20 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
     function document_end() {
 
         parent::document_end();
-        
+
         // Prepare the TOC
         global $TOC, $ID;
         $meta = array();
-        
+
         $forceToc = $this->info['forceTOC'] || p_get_metadata($ID, 'internal forceTOC', false);
-        
+
         // NOTOC, and no forceTOC
         if ( $this->info['toc'] === false && !$forceToc ) {
             $TOC = $this->toc = array();
             $meta['internal']['toc'] = false;
             $meta['description']['tableofcontents'] = array();
             $meta['internal']['forceTOC'] = false;
-            
+
         } else if ( $forceToc || (utf8_strlen(strip_tags($this->doc)) >= $this->getConf('documentlengthfortoc') && count($this->toc) > 1 ) ) {
             $TOC = $this->toc;
             // This is a little bit like cheating ... but this will force the TOC into the metadata
@@ -121,14 +122,14 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
         global $INFO;
 
         if($text) {
-	        
-	        // Check Text for hint about a CSS style class
-	        $class = "";
-	        if ( preg_match("/^class:(.*?)>(.*?)$/", $text, $matches) ) {
-		        $class = ' ' . $this->_xmlEntities($matches[1]);
-		        $text = $matches[2];
-	        }
-	        	        
+
+            // Check Text for hint about a CSS style class
+            $class = "";
+            if ( preg_match("/^class:(.*?)>(.*?)$/", $text, $matches) ) {
+                $class = ' ' . $this->_xmlEntities($matches[1]);
+                $text = $matches[2];
+            }
+
             /* There should be no class for "sectioneditX" if there is no edit perm */
             $maxLevel = $conf['maxseclevel'];
             if ( $INFO['perm'] <= AUTH_READ )
@@ -157,12 +158,12 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
 
                 $headingNumber = preg_replace("/(\.0)+\.?$/", '', $headingNumber) . ' ';
             }
-			
-			$doc = $this->doc;
-			$this->doc = "";
-			
+
+            $doc = $this->doc;
+            $this->doc = "";
+
             parent::header($headingNumber . $text, $level, $pos);
-            
+
             if ( $this->getConf('useSectionArticle') ) {
                 $this->doc = $doc . preg_replace("/(<h([1-9]))/", "<".($this->sectionLevel<1?'section':'article')." class=\"level\\2{$class}\">\\1", $this->doc);
             } else {
@@ -174,7 +175,7 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
         } else if ( $INFO['perm'] > AUTH_READ ) {
 
             if ( $hasSeenHeader ) $this->finishSectionEdit($pos);
-             
+
             // write the header
             $name = $this->startSectionEdit($pos, 'section_empty', rand() . $level);
             if ( $this->getConf('useSectionArticle') ) {
@@ -186,7 +187,7 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
 
         $hasSeenHeader = true;
     }
-    
+
     public function finishSectionEdit($end = null) {
         global $INFO;
         if ( $INFO['perm'] > AUTH_READ )
@@ -212,7 +213,7 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
             $this->doc .= '</'.($this->sectionLevel<1?'section':'article').'>'.DOKU_LF;
         }
     }
-    
+
     function section_open($level) {
         $this->sectionLevel++;
         return parent::section_open($level);
@@ -339,30 +340,15 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
             $this->doc .= $this->_formatLink($link);
         }
     }
-    
-    /**
-     * Render a page local link
-     *
-     * @param string $hash       hash link identifier
-     * @param string $name       name for the link
-     * @param bool   $returnonly whether to return html or write to doc attribute
-     * @return void|string writes to doc attribute or returns html depends on $returnonly
-     */
-    function locallink($hash, $name = null, $returnonly = false) {
+
+    function locallink($hash, $name = null){
         global $ID;
         $name  = $this->_getLinkTitle($name, $hash, $isImage);
         $hash  = $this->_headerToLink($hash);
         $title = $name;
-
-        $doc = '<a href="#'.$hash.'" title="'.$title.'" class="wikilink1">';
-        $doc .= $name;
-        $doc .= '</a>';
-
-        if($returnonly) {
-          return $doc;
-        } else {
-          $this->doc .= $doc;
-        }
+        $this->doc .= '<a href="#'.$hash.'" title="'.$title.'" class="wikilink1">';
+        $this->doc .= $name;
+        $this->doc .= '</a>';
     }
 
     function acronym($acronym) {
@@ -397,7 +383,7 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
         $string = $this->superentities($string);
 
         if ( $this->info['scriptmode'] ) {
-            $string = str_replace(	array( "&lt;%", "%&gt;", "&lt;?", "?&gt;"),
+            $string = str_replace(    array( "&lt;%", "%&gt;", "&lt;?", "?&gt;"),
             array( "<%", "%>", "<?", "?>"),
             $string);
         }
@@ -405,30 +391,30 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
         return $string;
     }
 
-	// Unicode-proof htmlentities. 
-	// Returns 'normal' chars as chars and weirdos as numeric html entites.
-	function superentities( $str ){
-	    // get rid of existing entities else double-escape
-	    $str2 = '';
-	    $str = html_entity_decode(stripslashes($str),ENT_QUOTES,'UTF-8'); 
-	    $ar = preg_split('/(?<!^)(?!$)(?!\n)/u', $str );  // return array of every multi-byte character
-	    foreach ($ar as $c){
-	        $o = ord($c);
-	        if ( // (strlen($c) > 1) || /* multi-byte [unicode] */
-	            ($o > 127) // || /* <- control / latin weirdos -> */
-	            // ($o <32 || $o > 126) || /* <- control / latin weirdos -> */
-	            // ($o >33 && $o < 40) ||/* quotes + ambersand */
-	            // ($o >59 && $o < 63) /* html */
-	            
-	        ) {
-	            // convert to numeric entity
-	            $c = mb_encode_numericentity($c,array (0x0, 0xffff, 0, 0xffff), 'UTF-8');
-	        }
-	        $str2 .= $c;
-	    }
-	    return $str2;
-	}
-	
+    // Unicode-proof htmlentities. 
+    // Returns 'normal' chars as chars and weirdos as numeric html entites.
+    function superentities( $str ){
+        // get rid of existing entities else double-escape
+        $str2 = '';
+        $str = html_entity_decode(stripslashes($str),ENT_QUOTES,'UTF-8'); 
+        $ar = preg_split('/(?<!^)(?!$)(?!\n)/u', $str );  // return array of every multi-byte character
+        foreach ($ar as $c){
+            $o = ord($c);
+            if ( // (strlen($c) > 1) || /* multi-byte [unicode] */
+                ($o > 127) // || /* <- control / latin weirdos -> */
+                // ($o <32 || $o > 126) || /* <- control / latin weirdos -> */
+                // ($o >33 && $o < 40) ||/* quotes + ambersand */
+                // ($o >59 && $o < 63) /* html */
+
+            ) {
+                // convert to numeric entity
+                $c = mb_encode_numericentity($c,array (0x0, 0xffff, 0, 0xffff), 'UTF-8');
+            }
+            $str2 .= $c;
+        }
+        return $str2;
+    }
+
     /**
      * Renders internal and external media
      *
@@ -447,16 +433,16 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
 
         list($ext, $mime) = mimetype($src);
         if(substr($mime, 0, 5) == 'image' && !($w && $h) ) {
-            
+
             $info = @getimagesize(mediaFN($src)); //get original size
             if($info !== false) {
-                
+
                 if ( !$w && !$h ) $w = $info[0];  
                 if(!$h) $h = round(($w * $info[1]) / $info[0]);
                 if(!$w) $w = round(($h * $info[0]) / $info[1]);
             }
         }
-        
+
         return parent::_media($src, $title, $align, $w, $h, $cache, $render);
     }
 }
