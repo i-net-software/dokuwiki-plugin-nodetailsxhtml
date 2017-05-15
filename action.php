@@ -14,33 +14,33 @@ require_once(DOKU_PLUGIN.'action.php');
 
 class action_plugin_nodetailsxhtml extends DokuWiki_Action_Plugin {
 
-	/**
-	 * for backward compatability
-	 * @see inc/DokuWiki_Plugin#getInfo()
-	 */
+    /**
+     * for backward compatability
+     * @see inc/DokuWiki_Plugin#getInfo()
+     */
     function getInfo(){
         if ( method_exists(parent, 'getInfo')) {
             $info = parent::getInfo();
         }
         return is_array($info) ? $info : confToHash(dirname(__FILE__).'/../plugin.info.txt');
     }
-	
-    	/**
-	* Register Plugin in DW
-	**/
-	function register(Doku_Event_Handler $controller) {
-		$controller->register_hook('TPL_TOC_RENDER', 'BEFORE', $this, 'check_toc');
-	}
-	
-	/**
-	* Check for Template changes
-	**/
-	function check_toc( &$event ) {
-		global $conf, $INFO;
-	
-		if ( empty($event->data) && $INFO['meta']['forceTOC'] ) {
-		    $event->data = $INFO['meta']['description']['tableofcontents'];
-		}
-		
-	}
+    
+        /**
+    * Register Plugin in DW
+    **/
+    function register(Doku_Event_Handler $controller) {
+        $controller->register_hook('TPL_TOC_RENDER', 'BEFORE', $this, 'check_toc');
+    }
+    
+    /**
+    * Check for Template changes
+    **/
+    function check_toc( &$event ) {
+        global $conf, $INFO;
+    
+        if ( empty($event->data) && $INFO['meta']['forceTOC'] ) {
+            $event->data = $INFO['meta']['description']['tableofcontents'];
+        }
+        
+    }
 }
