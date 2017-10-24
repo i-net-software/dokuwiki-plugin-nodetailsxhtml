@@ -34,11 +34,11 @@ class syntax_plugin_nodetailsxhtml_scripting extends DokuWiki_Syntax_Plugin {
         $this->Lexer->addSpecialPattern('~~isScripting~~', $mode, 'plugin_nodetailsxhtml_scripting');
     }
 
-    function handle($match, $state, $pos, &$handler) {
+    function handle($match, $state, $pos, Doku_Handler $handler) {
         return $match; 
     }    
 
-    function render($mode, &$renderer, $data) {
+    function render($mode, Doku_Renderer $renderer, $data) {
         $renderer->info['scriptmode'] = true;
         return true;
     }

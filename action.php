@@ -35,7 +35,7 @@ class action_plugin_nodetailsxhtml extends DokuWiki_Action_Plugin {
     /**
     * Check for Template changes
     **/
-    function check_toc( &$event ) {
+    function check_toc( Doku_Event $event ) {
         global $conf, $INFO;
     
         if ( empty($event->data) && $INFO['meta']['forceTOC'] ) {
@@ -44,3 +44,5 @@ class action_plugin_nodetailsxhtml extends DokuWiki_Action_Plugin {
         
     }
 }
+
+//Setup VIM: ex: et ts=4 enc=utf-8 :

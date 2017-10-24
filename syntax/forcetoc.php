@@ -34,11 +34,11 @@ class syntax_plugin_nodetailsxhtml_forcetoc extends DokuWiki_Syntax_Plugin {
         $this->Lexer->addSpecialPattern('~~forceTOC~~', $mode, 'plugin_nodetailsxhtml_forcetoc');
     }
 
-    function handle($match, $state, $pos, &$handler) {
+    function handle($match, $state, $pos, Doku_Handler $handler) {
         return $match; 
     }    
 
-    function render($mode, &$renderer, $data) {
+    function render($mode, Doku_Renderer $renderer, $data) {
         global $ID, $INFO;
 
         $renderer->info['forceTOC'] = true;
