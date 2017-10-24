@@ -341,7 +341,7 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
         }
     }
 
-    function locallink($hash, $name = null){
+    function locallink($hash, $name = NULL, $returnonly = false){
         global $ID;
         $name  = $this->_getLinkTitle($name, $hash, $isImage);
         $hash  = $this->_headerToLink($hash);
