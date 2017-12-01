@@ -188,7 +188,7 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
         $hasSeenHeader = true;
     }
 
-    public function finishSectionEdit($end = null) {
+    public function finishSectionEdit($end = null, $hid = null) {
         global $INFO;
         if ( $INFO['perm'] > AUTH_READ )
         {
@@ -196,7 +196,7 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
         }
     }
 
-    public function startSectionEdit($start, $type, $title = null) {
+    public function startSectionEdit($start, $type, $title = null, $hid = null) {
         global $INFO;
         if ( $INFO['perm'] > AUTH_READ )
         {
