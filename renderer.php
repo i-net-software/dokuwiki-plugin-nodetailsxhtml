@@ -192,7 +192,7 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
         global $INFO;
         if ( $INFO['perm'] > AUTH_READ )
         {
-            return parent::finishSectionEdit($end);
+            return parent::finishSectionEdit($end, $hid);
         }
     }
 
@@ -200,7 +200,7 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
         global $INFO;
         if ( $INFO['perm'] > AUTH_READ )
         {
-            return parent::startSectionEdit($start, $type, $title);
+            return parent::startSectionEdit($start, $type, $title, $hid);
         }
 
         return "";
