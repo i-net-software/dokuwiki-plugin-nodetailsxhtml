@@ -172,7 +172,7 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
             if ( $hasSeenHeader ) $this->finishSectionEdit($pos);
 
             // write the header
-            $name = $this->startSectionEdit($pos, 'section_empty', rand() . $level);
+            $name = $this->startSectionEdit($pos, array( 'target' => 'section_empty', 'name' => rand() . $level));
             if ( $this->getConf('useSectionArticle') ) {
                 $this->doc .= '<'.($this->sectionLevel<1?'section':'article').' class="'.$name.'">';
             }
