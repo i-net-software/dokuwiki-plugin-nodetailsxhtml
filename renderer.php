@@ -46,12 +46,7 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
      * return some info
      */
     function getInfo(){
-        if ( method_exists(parent, 'getInfo')) {
-            $info = parent::getInfo();
-        }
-        return array_merge(is_array($info) ? $info : confToHash(dirname(__FILE__).'/../plugin.info.txt'), array(
-
-        ));
+        return confToHash(dirname(__FILE__).'/plugin.info.txt');
     }
 
     function canRender($format) {
@@ -196,11 +191,11 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
         }
     }
 
-    public function startSectionEdit($start, $type, $title = null, $hid = null) {
+    public function startSectionEdit($start, $data) {
         global $INFO;
         if ( $INFO['perm'] > AUTH_READ )
         {
-            return parent::startSectionEdit($start, $type, $title, $hid);
+            return parent::startSectionEdit($start, $data);
         }
 
         return "";
