@@ -442,7 +442,7 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
                 if(!$w) $w = round(($h * $info[0]) / $info[1]);
                 
                 // There is a two times image
-                if ( 2*$w >= $origWidth ) {
+                if ( 2*2/3*$w <= $origWidth ) { // If the image is at least 1.6 times as large ...
 	                $srcset[] = ml($src, array('w' => 2*$w, 'h' => 2*$h, 'cache' => $cache, 'rev'=>$this->_getLastMediaRevisionAt($src))) . ' 2x';
                 } else {
 	                
