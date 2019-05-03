@@ -427,18 +427,47 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
                     $h = null, $cache = null, $render = true) {
 
         list($ext, $mime) = mimetype($src);
-        if(substr($mime, 0, 5) == 'image' && !($w && $h) ) {
+        if(substr($mime, 0, 5) == 'image') {
 
             $info = @getimagesize(mediaFN($src)); //get original size
+            $srcset = [];
+            
             if($info !== false) {
-
-                if ( !$w && !$h ) $w = $info[0];  
+	            
+	            $origWidth = $info[0];
+	            $origHeight = $info[1];
+	            
+	            if ( !$w && !$h ) $w = $info[0];  
                 if(!$h) $h = round(($w * $info[1]) / $info[0]);
                 if(!$w) $w = round(($h * $info[0]) / $info[1]);
+                
+                // There is a two times image
+                if ( 2*$w >= $origWidth ) {
+	                $srcset[] = ml($src, array('w' => 2*$w, 'h' => 2*$h, 'cache' => $cache, 'rev'=>$this->_getLastMediaRevisionAt($src))) . ' 2x';
+                } else {
+	                
+	                // Check for alternate image
+	                $ext = strrpos($src, '.');
+	                $additionalSrc = substr( $src, 0, $ext) . '@2x.' . substr($src, $ext+1);
+	                
+	                $additionalInfo = @getimagesize(mediaFN($additionalSrc)); //get original size
+	                if ( $additionalInfo !== false ) {
+		                // Image exists
+						$srcset[] = ml($additionalSrc, array('w' => 2*$w, 'h' => 2*$h, 'cache' => $cache, 'rev'=>$this->_getLastMediaRevisionAt($srcSetURL))) . ' 2x';
+	                }
+                }
+
+				$ret = parent::_media($src, $title, $align, $w, $h, $cache, $render);
+				if ( count($srcset) > 0 )
+					return str_replace("/>", ' srcset="' . implode(',', $srcset) . '" />', $ret );
+				else
+					return $ret;
+
             }
         }
 
         return parent::_media($src, $title, $align, $w, $h, $cache, $render);
     }
 }
+
 //Setup VIM: ex: et ts=4 enc=utf-8 :
