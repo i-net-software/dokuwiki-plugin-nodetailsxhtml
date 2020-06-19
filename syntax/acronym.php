@@ -61,7 +61,15 @@ class syntax_plugin_nodetailsxhtml_acronym extends DokuWiki_Syntax_Plugin {
         if ( strlen($this->pattern) > 0 ) {
             $this->Lexer->addSpecialPattern($this->pattern,$mode,'acronym');
         }
-    } 
+    }
+
+    function handle($match, $state, $pos, Doku_Handler $handler) {
+        return $match; 
+    }    
+
+    function render($mode, Doku_Renderer $renderer, $data) {
+        return true;
+    }
 }
 
 //Setup VIM: ex: et ts=4 enc=utf-8 :
