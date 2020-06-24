@@ -71,10 +71,10 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
             $conf['tocminheads'] = 1;
         }
 
-        $newMeta = $meta['description']['tableofcontents'];
-        if ( !empty( $newMeta ) && count($newMeta) > 1 ) {
+        $newMeta = $meta['description'];
+        if ( is_array($newMeta) && !empty( $newMeta['tableofcontents'] ) && count($newMeta['tableofcontents']) > 1 ) {
             // $TOC = $this->toc = $newMeta; // 2010-08-23 doubled the TOC
-            $TOC = $newMeta;
+            $TOC = $newMeta['tableofcontents'];
         }
     }
 
