@@ -458,12 +458,12 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
                 }
 
 				$ret = parent::_media($src, $title, $align, $w, $h, $cache, $render);
-                if ( count($srcset) > 0 )
+                if ( count($srcset) > 0 ) {
                     $srcset[] = ml($src, array('w' => $w, 'h' => $h, 'cache' => $cache, 'rev'=>$this->_getLastMediaRevisionAt($src))) . ' 1x';
                     return str_replace("/>", ' srcset="' . implode(',', $srcset) . '" />', $ret );
-				else
-					return $ret;
-
+                } else {
+                    return $ret;
+                }
             }
         }
 
