@@ -452,16 +452,19 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
                 if ( 2*2/3*$w <= $origWidth ) { // If the image is at least 1.6 times as large ...
 	                $srcset[] = ml($src, array('w' => 2*$w, 'h' => 2*$h, 'cache' => $cache, 'rev'=>$this->_getLastMediaRevisionAt($src))) . ' 2x';
                 } else {
-	                
+
 	                // Check for alternate image
 	                $ext = strrpos($src, '.');
-	                $additionalSrc = substr( $src, 0, $ext) . '@2x.' . substr($src, $ext+1);
-	                
-	                $additionalInfo = @getimagesize(mediaFN($additionalSrc)); //get original size
-	                if ( $additionalInfo !== false ) {
-		                // Image exists
-						$srcset[] = ml($additionalSrc, array('w' => 2*$w, 'h' => 2*$h, 'cache' => $cache, 'rev'=>$this->_getLastMediaRevisionAt($srcSetURL))) . ' 2x';
-	                }
+
+                    foreach ( array( '@2x.', '-2x.', '_2x.') as $extension ) {
+    	                $additionalSrc = substr( $src, 0, $ext) . $extension . substr($src, $ext+1);
+    	                $additionalInfo = @getimagesize(mediaFN($additionalSrc)); //get original size
+    	                if ( $additionalInfo !== false ) {
+                            // Image exists
+                            $srcset[] = ml($additionalSrc, array('w' => 2*$w, 'h' => 2*$h, 'cache' => $cache, 'rev'=>$this->_getLastMediaRevisionAt($srcSetURL))) . ' 2x';
+                            break;
+    	                }
+                    }
                 }
 
 				$ret = parent::_media($src, $title, $align, $w, $h, $cache, $render);
