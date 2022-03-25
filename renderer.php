@@ -108,7 +108,7 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
         p_set_metadata($ID, $meta);
 
         // make sure there are no empty blocks
-        $this->doc = preg_replace('#<(div|section|article) class=".*?level\d.*?">\s*</(div|section|article)>#','',$this->doc);
+        $this->doc = preg_replace('#<(div|section|article) class="[^"]*?level\d[^"]*?">\s*</\1>#','',$this->doc);
     }
 
     function header($text, $level, $pos) {
