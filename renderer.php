@@ -159,11 +159,13 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
 
             parent::header($headingNumber . $text, $level, $pos);
 
-            $matches = [];
-            preg_match("/id=\"(.*?)\"/", $this->doc, $matches);
-            if ( count($matches) > 1 ) {
-                $this->doc = preg_replace("/id=\".*?\"/", '', $this->doc);
-                $this->doc = DOKU_LF.'<a id="'. $matches[1] .'" class="head-anchor" style="visibility:hidden"></a>'.DOKU_LF . $this->doc;
+            if ( $this->getConf('useHeadAnchorInsteadOfHeaderID') ) {
+                $matches = [];
+                preg_match("/id=\"(.*?)\"/", $this->doc, $matches);
+                if ( count($matches) > 1 ) {
+                    $this->doc = preg_replace("/id=\".*?\"/", '', $this->doc);
+                    $this->doc = DOKU_LF.'<a id="'. $matches[1] .'" class="head-anchor" style="visibility:hidden"></a>'.DOKU_LF . $this->doc;
+                }
             }
 
             if ( $this->getConf('useSectionArticle') ) {
