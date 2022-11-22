@@ -111,7 +111,7 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
         $this->doc = preg_replace('#<(div|section|article) class="[^"]*?level\d[^"]*?">\s*</\1>#','',$this->doc);
     }
 
-    function header($text, $level, $pos) {
+    function header($text, $level, $pos, $returnonly = false) {
         global $conf;
         global $ID;
         global $INFO;
