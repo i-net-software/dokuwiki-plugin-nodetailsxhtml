@@ -95,7 +95,7 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
             $meta['description']['tableofcontents'] = array();
             $meta['internal']['forceTOC'] = false;
 
-        } else if ( $forceToc || (utf8_strlen(strip_tags($this->doc)) >= $this->getConf('documentlengthfortoc') && count($this->toc) > 1 ) ) {
+        } else if ( $forceToc || ($this->utf8_strlen(strip_tags($this->doc)) >= $this->getConf('documentlengthfortoc') && count($this->toc) > 1 ) ) {
             $TOC = $this->toc;
             // This is a little bit like cheating ... but this will force the TOC into the metadata
             $meta = array();
@@ -109,6 +109,14 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
 
         // make sure there are no empty blocks
         $this->doc = preg_replace('#<(div|section|article) class="[^"]*?level\d[^"]*?">\s*</\1>#','',$this->doc);
+    }
+
+    private function utf8_strlen( $input ) {
+        if ( class_exists('dokuwiki\Utf8\PhpString') ) {
+            return dokuwiki\Utf8\PhpString::strlen( $input );
+        } else {
+            return utf8_strlen( $input );
+        }
     }
 
     function header($text, $level, $pos, $returnonly = false) {
