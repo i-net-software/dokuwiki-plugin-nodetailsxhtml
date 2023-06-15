@@ -227,7 +227,12 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
                             $height=null, $cache=null, $linking=null, $return=NULL) {
         global $ID;
         list($src,$hash) = explode('#',$src,2);
-        resolve_mediaid(getNS($ID),$src, $exists);
+
+        if ( class_exists('dokuwiki\File\MediaResolver') ) {
+            $src = (new dokuwiki\File\MediaResolver($ID))->resolveId($src);
+        } else {
+            resolve_mediaid(getNS($ID),$src, $exists);
+        }
 
         $noLink = false;
         $render = ($linking == 'linkonly') ? false : true;
@@ -290,7 +295,11 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
         $default = $this->_simpleTitle($id);
 
         // now first resolve and clean up the $id
-        resolve_pageid(getNS($ID),$id,$exists);
+        if ( class_exists('dokuwiki\File\PageResolver') ) {
+            $id = (new dokuwiki\File\PageResolver($ID))->resolveId($id);
+        } else {
+            resolve_pageid(getNS($ID),$id,$exists);
+        }
 
         $name = $this->_getLinkTitle($name, $default, $isImage, $id, $linktype);
         if ( !$isImage ) {
