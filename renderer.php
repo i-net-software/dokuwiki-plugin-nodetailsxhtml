@@ -238,6 +238,7 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
 
         if ( class_exists('dokuwiki\File\MediaResolver') ) {
             $src = (new dokuwiki\File\MediaResolver($ID))->resolveId($src);
+            $exists = media_exists($src);
         } else {
             resolve_mediaid(getNS($ID),$src, $exists);
         }
@@ -305,6 +306,7 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
         // now first resolve and clean up the $id
         if ( class_exists('dokuwiki\File\PageResolver') ) {
             $id = (new dokuwiki\File\PageResolver($ID))->resolveId($id);
+            $exists = page_exists($id);
         } else {
             resolve_pageid(getNS($ID),$id,$exists);
         }
