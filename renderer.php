@@ -420,34 +420,34 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
             $srcset = [];
             
             if($info !== false) {
-	            
-	            $origWidth = $info[0];
-	            $origHeight = $info[1];
-	            
-	            if ( !$w && !$h ) $w = $info[0];  
+                
+                $origWidth = $info[0];
+                $origHeight = $info[1];
+                
+                if ( !$w && !$h ) $w = $info[0];  
                 if(!$h) $h = round(($w * $info[1]) / $info[0]);
                 if(!$w) $w = round(($h * $info[0]) / $info[1]);
                 
                 // There is a two times image
                 if ( 2*2/3*$w <= $origWidth ) { // If the image is at least 1.6 times as large ...
-	                $srcset[] = ml($src, array('w' => 2*$w, 'h' => 2*$h, 'cache' => $cache, 'rev'=>$this->_getLastMediaRevisionAt($src))) . ' 2x';
+                    $srcset[] = ml($src, array('w' => 2*$w, 'h' => 2*$h, 'cache' => $cache, 'rev'=>$this->_getLastMediaRevisionAt($src))) . ' 2x';
                 } else {
 
-	                // Check for alternate image
-	                $ext = strrpos($src, '.');
+                    // Check for alternate image
+                    $ext = strrpos($src, '.');
 
                     foreach ( array( '@2x.', '-2x.', '_2x.') as $extension ) {
-    	                $additionalSrc = substr( $src, 0, $ext) . $extension . substr($src, $ext+1);
-    	                $additionalInfo = @getimagesize(mediaFN($additionalSrc)); //get original size
-    	                if ( $additionalInfo !== false ) {
+                        $additionalSrc = substr( $src, 0, $ext) . $extension . substr($src, $ext+1);
+                        $additionalInfo = @getimagesize(mediaFN($additionalSrc)); //get original size
+                        if ( $additionalInfo !== false ) {
                             // Image exists
                             $srcset[] = ml($additionalSrc, array('w' => 2*$w, 'h' => 2*$h, 'cache' => $cache, 'rev'=>$this->_getLastMediaRevisionAt($srcSetURL))) . ' 2x';
                             break;
-    	                }
+                        }
                     }
                 }
 
-				$ret = parent::_media($src, $title, $align, $w, $h, $cache, $render);
+                $ret = parent::_media($src, $title, $align, $w, $h, $cache, $render);
                 if ( count($srcset) > 0 ) {
                     return str_replace("/>", ' srcset="' . implode(',', $srcset) . '" />', $ret );
                 } else {
