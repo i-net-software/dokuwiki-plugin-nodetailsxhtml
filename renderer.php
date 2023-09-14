@@ -231,47 +231,6 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
         return parent::section_open($level);
     }
 
-    function internalmedia ($src, $title=null, $align=null, $width=null,
-                            $height=null, $cache=null, $linking=null, $return=NULL) {
-        global $ID;
-        list($src,$hash) = explode('#',$src,2);
-
-        if ( class_exists('dokuwiki\File\MediaResolver') ) {
-            $src = (new dokuwiki\File\MediaResolver($ID))->resolveId($src);
-            $exists = media_exists($src);
-        } else {
-            resolve_mediaid(getNS($ID),$src, $exists);
-        }
-
-        $noLink = false;
-        $render = ($linking == 'linkonly') ? false : true;
-        $link = $this->_getMediaLinkConf($src, $title, $align, $width, $height, $cache, $render);
-
-        list($ext,$mime,$dl) = mimetype($src);
-        if(substr($mime,0,5) == 'image' && $render){
-            $link['url'] = ml($src,array('id'=>$ID,'cache'=>$cache),($linking=='direct'));
-            if ( substr($mime,0,5) == 'image' && $linking='details' ) { $noLink = true;}
-        }elseif($mime == 'application/x-shockwave-flash' && $render){
-            // don't link flash movies
-            $noLink = true;
-        }else{
-            // add file icons
-            $class = preg_replace('/[^_\-a-z0-9]+/i','_',$ext);
-            $link['class'] .= ' mediafile mf_'.$class;
-            $link['url'] = ml($src,array('id'=>$ID,'cache'=>$cache),true);
-        }
-
-        if($hash) $link['url'] .= '#'.$hash;
-
-        //markup non existing files
-        if (!$exists)
-        $link['class'] .= ' wikilink2';
-
-        //output formatted
-        if ($linking == 'nolink' || $noLink) $this->doc .= $link['name'];
-        else $this->doc .= $this->_formatLink($link);
-    }
-
     /**
      * Render an internal Wiki Link
      *
@@ -498,6 +457,46 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
         }
 
         return parent::_media($src, $title, $align, $w, $h, $cache, $render);
+    }
+
+    /**
+     * helperfunction to return a basic link to a media
+     *
+     * used in internalmedia() and externalmedia()
+     *
+     * @author   Pierre Spring <pierre.spring@liip.ch>
+     * @param string $src       media ID
+     * @param string $title     descriptive text
+     * @param string $align     left|center|right
+     * @param int    $width     width of media in pixel
+     * @param int    $height    height of media in pixel
+     * @param string $cache     cache|recache|nocache
+     * @param bool   $render    should the media be embedded inline or just linked
+     * @return array associative array with link config
+     */
+    public function _getMediaLinkConf($src, $title, $align, $width, $height, $cache, $render) {
+        $link = parent::_getMediaLinkConf( $src, $title, $align, $width, $height, $cache, $render );
+        // set a marker for media links, whcih we do not want to have.
+        $link['nodetails'] = true;
+        return $link;
+    }
+
+    /**
+     * Build a link
+     *
+     * Assembles all parts defined in $link returns HTML for the link
+     *
+     * @param array $link attributes of a link
+     * @return string
+     *
+     * @author Andreas Gohr <andi@splitbrain.org>
+     */
+    public function _formatLink($link) {
+        if ( $link['nodetails'] ) {
+            return $link['name'];
+        }
+        
+        return parent::_formatLink($link);
     }
 }
 
