@@ -38,7 +38,7 @@ class action_plugin_nodetailsxhtml extends DokuWiki_Action_Plugin {
     function check_toc( Doku_Event $event ) {
         global $conf, $INFO;
     
-        if ( empty($event->data) && $INFO['meta']['forceTOC'] ) {
+        if ( empty($event->data) && array_key_exists( 'forceTOC', $INFO['meta'] ) && $INFO['meta']['forceTOC'] == true ) {
             $event->data = $INFO['meta']['description']['tableofcontents'];
         }
         
