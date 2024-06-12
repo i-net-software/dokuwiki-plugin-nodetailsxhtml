@@ -450,10 +450,12 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
                 $ret = parent::_media($src, $title, $align, $w, $h, $cache, $render);
                 if ( count($srcset) > 0 ) {
                     return str_replace("/>", ' srcset="' . implode(',', $srcset) . '" />', $ret );
-                } else {
-                    return $ret;
                 }
+                return $ret;
             }
+        } elseif(media_supportedav($mime, 'video') || media_supportedav($mime, 'audio')) {
+            $ret = parent::_media($src, $title, $align, $w, $h, $cache, $render);
+            return str_replace("controls=\"controls\"", ' autoplay="autoplay" loop="loop"', $ret );
         }
 
         return parent::_media($src, $title, $align, $w, $h, $cache, $render);
