@@ -455,7 +455,7 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
             }
         } elseif(media_supportedav($mime, 'video') || media_supportedav($mime, 'audio')) {
             $ret = parent::_media($src, $title, $align, $w, $h, $cache, $render);
-            return str_replace("controls=\"controls\"", ' autoplay="autoplay" loop="loop"', $ret );
+            return str_replace("controls=\"controls\"", ' autoplay="autoplay" loop="loop" muted="muted"', $ret );
         }
 
         return parent::_media($src, $title, $align, $w, $h, $cache, $render);
