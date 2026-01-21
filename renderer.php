@@ -283,7 +283,9 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
         }
 
         //keep hash anchor
-        list($id,$hash) = explode('#',$id,2);
+        $hashParts = explode('#',$id,2);
+        $id = $hashParts[0];
+        $hash = isset($hashParts[1]) ? $hashParts[1] : '';
         if(!empty($hash)) $hash = $this->_headerToLink($hash);
 
         //prepare for formating
@@ -494,7 +496,7 @@ class renderer_plugin_nodetailsxhtml extends Doku_Renderer_xhtml {
      * @author Andreas Gohr <andi@splitbrain.org>
      */
     public function _formatLink($link) {
-        if ( $link['nodetails'] ) {
+        if ( isset($link['nodetails']) && $link['nodetails'] ) {
             return $link['name'];
         }
         
